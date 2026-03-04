@@ -215,3 +215,31 @@ function initGyroscope() {
         window.addEventListener('deviceorientation', updateTransforms);
     }
 }
+/**
+ * PERSONALIZATION ENGINE — v3.0
+ * Handles custom links for friends like ?name=Rahul
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const friendName = urlParams.get('name');
+
+    if (friendName) {
+        // Find the signature line (From Aniket Tiwari)
+        const sigElement = document.querySelector('#finale-env p:last-child');
+        
+        if (sigElement) {
+            const decodedName = decodeURIComponent(friendName);
+            
+            // Apply the new name with a small UI polish
+            sigElement.innerHTML = `From ${decodedName}`;
+            
+            // If the name is long, slightly shrink the font so it doesn't overlap idols
+            if (decodedName.length > 15) {
+                sigElement.style.fontSize = '1.4rem';
+            }
+        }
+
+        // Update the browser tab title
+        document.title = `Holi Wishes from ${decodeURIComponent(friendName)}!`;
+    }
+});
