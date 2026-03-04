@@ -224,14 +224,22 @@ window.addEventListener('DOMContentLoaded', () => {
     const friendName = urlParams.get('name');
 
     if (friendName) {
-        // This now matches the ID we just added to Line 55
-        const sigElement = document.getElementById('sender-name');
+        const decodedName = decodeURIComponent(friendName);
         
+        // 1. Update the Main Signature (Line 55)
+        const sigElement = document.getElementById('sender-name');
         if (sigElement) {
-            const decodedName = decodeURIComponent(friendName);
             sigElement.innerHTML = `From ${decodedName}`;
         }
-        document.title = `Holi Wishes from ${decodeURIComponent(friendName)}!`;
+
+        // 2. Update the Footer Credit (The new span we just added)
+        const footerElement = document.getElementById('footer-name');
+        if (footerElement) {
+            footerElement.innerHTML = decodedName;
+        }
+
+        document.title = `Holi Wishes from ${decodedName}!`;
     }
 });
+
 
