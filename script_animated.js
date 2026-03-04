@@ -224,22 +224,14 @@ window.addEventListener('DOMContentLoaded', () => {
     const friendName = urlParams.get('name');
 
     if (friendName) {
-        // Find the signature line (From Aniket Tiwari)
-        const sigElement = document.querySelector('#finale-env p:last-child');
+        // This now matches the ID we just added to Line 55
+        const sigElement = document.getElementById('sender-name');
         
         if (sigElement) {
             const decodedName = decodeURIComponent(friendName);
-            
-            // Apply the new name with a small UI polish
             sigElement.innerHTML = `From ${decodedName}`;
-            
-            // If the name is long, slightly shrink the font so it doesn't overlap idols
-            if (decodedName.length > 15) {
-                sigElement.style.fontSize = '1.4rem';
-            }
         }
-
-        // Update the browser tab title
         document.title = `Holi Wishes from ${decodeURIComponent(friendName)}!`;
     }
 });
+
