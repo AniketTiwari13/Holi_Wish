@@ -83,12 +83,12 @@ function handleGlobalTap(e) {
     // === [ PHASE 3: THE OMNIDIRECTIONAL EXPLOSION (T=0.2s) ] ===
     setTimeout(() => {
         confetti({
-            particleCount: 200,
+            particleCount: 100,
             spread: 70,
             scalar: 0.4,
-            shapes: ['circle'], // STRICT ENFORCEMENT: ONLY CIRCLES
+            shapes: ['circle'],
             colors: ['#ff0090', '#00f0ff', '#ffea00', '#ff6600'],
-            origin: { x: 0.5, y: 0.5 }, // Center burst
+            origin: { x: 0.5, y: 0.5 },
             gravity: 0.8
         });
     }, 200);
@@ -148,27 +148,26 @@ function fireDirectionalCannons() {
     krishnaWrapper.classList.add('active-throw-k');
     radhaWrapper.classList.add('active-throw-r');
 
-    // Use y: 0.7 for Mobile (Portrait) and y: 0.8 for PC (Landscape)
-    const responsiveY = window.innerHeight > window.innerWidth ? 0.7 : 0.8;
-
-    // Krishna (Left)
+    // Krishna (Left) — precise hand alignment
     confetti({
         particleCount: 200,
-        origin: { x: 0.2, y: responsiveY },
+        origin: { x: 0.22, y: 0.82 },
         angle: 60,
         spread: 55,
         shapes: ['circle'],
-        colors: ['#ffea00', '#ff6600']
+        colors: ['#ffea00', '#ff6600'],
+        gravity: 1.2
     });
 
-    // Radha (Right)
+    // Radha (Right) — precise hand alignment
     confetti({
         particleCount: 200,
-        origin: { x: 0.8, y: responsiveY },
+        origin: { x: 0.78, y: 0.82 },
         angle: 120,
         spread: 55,
         shapes: ['circle'],
-        colors: ['#ff0090', '#00f0ff']
+        colors: ['#ff0090', '#00f0ff'],
+        gravity: 1.2
     });
 
     setTimeout(() => {
