@@ -55,29 +55,38 @@ function handleGlobalTap(e) {
     // === FIRST TAP: Initialize Timeline ===
     timelineStarted = true;
 
-    // 1. START AUDIO ABSOLUTELY FIRST (Before any permissions or alerts)
-    audioEl.volume = 0.0;
-    const playProm = audioEl.play();
+    // --- NUCLEAR AUDIO FIX: RE-INITIALIZE MANUALLY ---
+    // We stop relying on the HTML tag and create a fresh JS instance
+    const liveAudio = new Audio('Flute.mp3');
+    liveAudio.loop = true;
+    liveAudio.volume = 0.0;
+
+    // Kickstart play immediately
+    const playProm = liveAudio.play();
     if (playProm !== undefined) {
-        playProm.catch(err => console.log('Audio autoplay blocked:', err));
+        playProm.catch(err => {
+            console.error('Audio blocked:', err);
+            // Fallback: Try playing the original element if the new one fails
+            audioEl.play().catch(e => console.log("Total Audio Failure"));
+        });
     }
 
-    // 2. Start audio fade-in
+    // Audio cinematic fade-in for the new object
     let currentVol = 0.0;
     const fadeInLoop = setInterval(() => {
         currentVol += 0.05;
         if (currentVol >= 1.0) {
-            audioEl.volume = 1.0;
+            liveAudio.volume = 1.0;
             clearInterval(fadeInLoop);
         } else {
-            audioEl.volume = currentVol;
+            liveAudio.volume = currentVol;
         }
     }, 150);
 
-    // 3. NOW request Gyroscope (The prompt won't interrupt the audio now)
+    // Request Gyroscope permissions
     initGyroscope();
 
-    // 4. Hide the hook text instantly
+    // Hide the hook text
     hookLayer.style.opacity = '0';
 
     // === [ PHASE 3: THE OMNIDIRECTIONAL EXPLOSION (T=0.2s) ] ===
