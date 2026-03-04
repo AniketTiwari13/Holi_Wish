@@ -55,33 +55,27 @@ function handleGlobalTap(e) {
     // === FIRST TAP: Initialize Timeline ===
     timelineStarted = true;
 
-    // --- NUCLEAR AUDIO FIX: RE-INITIALIZE MANUALLY ---
-    // We stop relying on the HTML tag and create a fresh JS instance
-    const liveAudio = new Audio('flute.mp3');
-    liveAudio.loop = true;
-    liveAudio.volume = 0.0;
+    // --- MOBILE-SAFE AUDIO: Use existing DOM element ---
+    // Mobile browsers (Chrome Android, Safari iOS, WhatsApp WebView)
+    // prefer HTML audio elements already in the page over new Audio().
+    const liveAudio = document.getElementById("flute-track");
+    liveAudio.volume = 0;
 
-    // Kickstart play immediately
-    const playProm = liveAudio.play();
-    if (playProm !== undefined) {
-        playProm.catch(err => {
-            console.error('Audio blocked:', err);
-            // Fallback: Try playing the original element if the new one fails
-            audioEl.play().catch(e => console.log("Total Audio Failure"));
-        });
-    }
-
-    // Audio cinematic fade-in for the new object
-    let currentVol = 0.0;
-    const fadeInLoop = setInterval(() => {
-        currentVol += 0.05;
-        if (currentVol >= 1.0) {
-            liveAudio.volume = 1.0;
-            clearInterval(fadeInLoop);
-        } else {
-            liveAudio.volume = currentVol;
-        }
-    }, 150);
+    liveAudio.play().then(() => {
+        // Smooth fade-in
+        let vol = 0;
+        const fade = setInterval(() => {
+            vol += 0.05;
+            if (vol >= 1) {
+                liveAudio.volume = 1;
+                clearInterval(fade);
+            } else {
+                liveAudio.volume = vol;
+            }
+        }, 150);
+    }).catch(err => {
+        console.log("Mobile blocked audio:", err);
+    });
 
     // Request Gyroscope permissions
     initGyroscope();
@@ -228,4 +222,3 @@ function initGyroscope() {
         window.addEventListener('deviceorientation', updateTransforms);
     }
 }
-
