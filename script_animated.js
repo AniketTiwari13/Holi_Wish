@@ -55,27 +55,26 @@ function handleGlobalTap(e) {
     // === FIRST TAP: Initialize Timeline ===
     timelineStarted = true;
 
-    // --- MOBILE-SAFE AUDIO: Use existing DOM element ---
-    // Mobile browsers (Chrome Android, Safari iOS, WhatsApp WebView)
-    // prefer HTML audio elements already in the page over new Audio().
-    const liveAudio = document.getElementById("flute-track");
-    liveAudio.volume = 0;
-
-    liveAudio.play().then(() => {
-        // Smooth fade-in
-        let vol = 0;
-        const fade = setInterval(() => {
-            vol += 0.05;
-            if (vol >= 1) {
-                liveAudio.volume = 1;
-                clearInterval(fade);
-            } else {
-                liveAudio.volume = vol;
-            }
-        }, 150);
-    }).catch(err => {
-        console.log("Mobile blocked audio:", err);
-    });
+    // 1. Check if audioEl actually exists to prevent the script from crashing
+    if (audioEl) {
+        audioEl.volume = 0;
+        // 2. Play immediately - This is the "gesture unlock" for mobile
+        audioEl.play().then(() => {
+            // 3. Only if it successfully starts, run the fade-in
+            let vol = 0;
+            const fade = setInterval(() => {
+                vol += 0.05;
+                if (vol >= 1) {
+                    audioEl.volume = 1;
+                    clearInterval(fade);
+                } else {
+                    audioEl.volume = vol;
+                }
+            }, 150);
+        }).catch(err => {
+            console.error("Audio failed to start:", err);
+        });
+    }
 
     // Request Gyroscope permissions
     initGyroscope();
