@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Holi - Animated V2</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- canvas-confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- V2 Animated Stylesheet -->
+    <link rel="stylesheet" href="style_animated.css">
+</head>
+
+<body>
+
+    <!-- Audio Asset -->
+    <audio id="flute-track" src="Flute.mp3" loop preload="auto" class="hidden"></audio>
+
+    <!-- PHASE 1: THE HOOK -->
+    <div id="hook">
+        <div class="pulsing-hook-text">Tap to play Holi 🎨</div>
+    </div>
+
+    <!-- PHASE 4: THE DIVINE REVEAL -->
+    <div id="silhouettes-env" class="hidden">
+        <!-- Krishna (Left side) — wrapper carries breathing + throw animations -->
+        <div class="divine-wrapper-krishna" id="krishna-wrapper">
+            <img src="Krishna.svg" alt="Krishna Silhouette" class="base-black-svg" id="krishna-black">
+        </div>
+        <!-- Radha (Right side) — wrapper carries breathing + throw animations -->
+        <div class="divine-wrapper-radha" id="radha-wrapper">
+            <img src="Radha.svg" alt="Radha Silhouette" class="base-black-svg" id="radha-black">
+        </div>
+    </div>
+
+    <!-- PHASE 6: 3D PARALLAX PETALS -->
+    <div id="petals-env"></div>
+
+    <!-- PHASE 7: THE GRAND FINALE -->
+    <div id="finale-env" class="hidden">
+        <div class="greeting-column">
+            <div class="txt-lg">Happy Holi</div>
+            <div class="txt-md">To You And Your Family</div>
+            <div class="txt-sm">From Aniket Tiwari</div>
+        </div>
+    </div>
+
+    <div id="dev-signature" class="hidden">made with ❤️ by Aniket Tiwari</div>
+
+    <!-- V2 Animated Script -->
+    <script src="script_animated.js"></script>
+
+</body>
+
+</html>
