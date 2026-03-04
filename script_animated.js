@@ -57,7 +57,7 @@ function handleGlobalTap(e) {
 
     // --- NUCLEAR AUDIO FIX: RE-INITIALIZE MANUALLY ---
     // We stop relying on the HTML tag and create a fresh JS instance
-    const liveAudio = new Audio('Flute.mp3');
+    const liveAudio = new Audio('flute.mp3');
     liveAudio.loop = true;
     liveAudio.volume = 0.0;
 
@@ -228,3 +228,4 @@ function initGyroscope() {
         window.addEventListener('deviceorientation', updateTransforms);
     }
 }
+
