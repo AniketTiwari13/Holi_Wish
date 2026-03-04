@@ -6,16 +6,16 @@
 let timelineStarted = false;
 let throwInterval = null; // Reference to the continuous throw loop
 
-const hookLayer       = document.getElementById('hook');
-const audioEl         = document.getElementById('flute-track');
-const silhouettesEnv  = document.getElementById('silhouettes-env');
-const krishnaWrapper  = document.getElementById('krishna-wrapper');
-const radhaWrapper    = document.getElementById('radha-wrapper');
-const krBlack         = document.getElementById('krishna-black');
-const rdBlack         = document.getElementById('radha-black');
-const petalsEnv       = document.getElementById('petals-env');
-const finaleEnv       = document.getElementById('finale-env');
-const signature       = document.getElementById('dev-signature');
+const hookLayer = document.getElementById('hook');
+const audioEl = document.getElementById('flute-track');
+const silhouettesEnv = document.getElementById('silhouettes-env');
+const krishnaWrapper = document.getElementById('krishna-wrapper');
+const radhaWrapper = document.getElementById('radha-wrapper');
+const krBlack = document.getElementById('krishna-black');
+const rdBlack = document.getElementById('radha-black');
+const petalsEnv = document.getElementById('petals-env');
+const finaleEnv = document.getElementById('finale-env');
+const signature = document.getElementById('dev-signature');
 
 // === GLOBAL TAP LISTENER ===
 document.addEventListener('click', handleGlobalTap);
@@ -35,7 +35,7 @@ function handleGlobalTap(e) {
 
     // Haptics on EVERY tap
     if ('vibrate' in navigator) {
-        try { navigator.vibrate([50, 50, 50]); } catch(err){}
+        try { navigator.vibrate([50, 50, 50]); } catch (err) { }
     }
 
     // Subsequent taps: powder burst at tap location
@@ -55,13 +55,14 @@ function handleGlobalTap(e) {
     // === FIRST TAP: Initialize Timeline ===
     timelineStarted = true;
 
-    // Request Gyroscope permissions on user interaction
-    initGyroscope();
-
-    // Audio cinematic fade-in
+    // 1. START AUDIO ABSOLUTELY FIRST (Before any permissions or alerts)
     audioEl.volume = 0.0;
     const playProm = audioEl.play();
-    if (playProm !== undefined) playProm.catch(err => console.log('Audio autoplay blocked', err));
+    if (playProm !== undefined) {
+        playProm.catch(err => console.log('Audio autoplay blocked:', err));
+    }
+
+    // 2. Start audio fade-in
     let currentVol = 0.0;
     const fadeInLoop = setInterval(() => {
         currentVol += 0.05;
@@ -73,7 +74,10 @@ function handleGlobalTap(e) {
         }
     }, 150);
 
-    // Hide the hook text instantly
+    // 3. NOW request Gyroscope (The prompt won't interrupt the audio now)
+    initGyroscope();
+
+    // 4. Hide the hook text instantly
     hookLayer.style.opacity = '0';
 
     // === [ PHASE 3: THE OMNIDIRECTIONAL EXPLOSION (T=0.2s) ] ===
@@ -203,18 +207,15 @@ function initGyroscope() {
         silhouettesEnv.style.transform = `translate3d(${xTilt * 0.5}px, ${yTilt * 0.5}px, 0)`;
     }
 
-    // Explicit iOS 13+ permission request with debug alerts
+    // Explicit iOS 13+ permission request WITHOUT thread-blocking alerts
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(state => {
             if (state === 'granted') {
-                alert('Gyro Access Granted!');
                 window.addEventListener('deviceorientation', updateTransforms);
-            } else {
-                alert('Gyro Access Denied.');
             }
         }).catch(console.error);
     } else {
-        alert('Gyro Listener Attached');
+        // Standard Android
         window.addEventListener('deviceorientation', updateTransforms);
     }
 }
