@@ -41,10 +41,10 @@ function handleGlobalTap(e) {
     // Subsequent taps: powder burst at tap location
     if (timelineStarted) {
         confetti({
-            particleCount: 200,
-            spread: 70,
-            scalar: 0.4,
-            shapes: ['circle'], // STRICT ENFORCEMENT: ONLY CIRCLES
+            particleCount: 150,
+            spread: 60,
+            scalar: 0.5,
+            shapes: ['circle'],
             colors: ['#ff0090', '#00f0ff', '#ffea00', '#ff6600'],
             origin: { x: originX, y: originY },
             gravity: 0.8
@@ -52,15 +52,16 @@ function handleGlobalTap(e) {
         return;
     }
 
-    // === FIRST TAP: Initialize Timeline ===
+    // === FIRST TAP INITIALIZATION ===
     timelineStarted = true;
 
-    // 1. Check if audioEl actually exists to prevent the script from crashing
     if (audioEl) {
-        audioEl.volume = 0;
-        // 2. Play immediately - This is the "gesture unlock" for mobile
+        // MOBILE UNLOCK: Force load and unmute during the tap
+        audioEl.muted = false;
+        audioEl.load();
+
         audioEl.play().then(() => {
-            // 3. Only if it successfully starts, run the fade-in
+            audioEl.volume = 0;
             let vol = 0;
             const fade = setInterval(() => {
                 vol += 0.05;
@@ -71,15 +72,10 @@ function handleGlobalTap(e) {
                     audioEl.volume = vol;
                 }
             }, 150);
-        }).catch(err => {
-            console.error("Audio failed to start:", err);
-        });
+        }).catch(err => console.log("Mobile Audio Blocked:", err));
     }
 
-    // Request Gyroscope permissions
     initGyroscope();
-
-    // Hide the hook text
     hookLayer.style.opacity = '0';
 
     // === [ PHASE 3: THE OMNIDIRECTIONAL EXPLOSION (T=0.2s) ] ===
@@ -147,35 +143,34 @@ function handleGlobalTap(e) {
  * while simultaneously triggering their lunge animations.
  */
 function fireDirectionalCannons() {
-    // 1. Apply throwing animation classes (overrides idle breath)
     krishnaWrapper.classList.add('active-throw-k');
     radhaWrapper.classList.add('active-throw-r');
 
-    // 2. Fire confetti from Krishna's hand (LEFT → RIGHT)
+    // Adjusted coordinates for hand alignment (y: 0.7 is the sweet spot)
+    // Krishna (Left → Right)
     confetti({
-        particleCount: 200,
-        spread: 70,
-        scalar: 0.4,
-        shapes: ['circle'], // STRICT ENFORCEMENT: ONLY CIRCLES
-        colors: ['#ff0090', '#00f0ff', '#ffea00', '#ff6600'],
-        origin: { x: 0.15, y: 0.85 }, // Krishna Hand Coordinates
-        gravity: 0.8,
-        angle: 30
+        particleCount: 250,
+        spread: 80,
+        scalar: 0.6,
+        shapes: ['circle'],
+        colors: ['#ffea00', '#ff6600'], // Yellow/Orange for Krishna
+        origin: { x: 0.2, y: 0.7 },
+        angle: 45,
+        gravity: 0.9
     });
 
-    // 3. Fire confetti from Radha's hand (RIGHT → LEFT)
+    // Radha (Right → Left)
     confetti({
-        particleCount: 200,
-        spread: 70,
-        scalar: 0.4,
-        shapes: ['circle'], // STRICT ENFORCEMENT: ONLY CIRCLES
-        colors: ['#ff0090', '#00f0ff', '#ffea00', '#ff6600'],
-        origin: { x: 0.85, y: 0.85 }, // Radha Hand Coordinates
-        gravity: 0.8,
-        angle: 150
+        particleCount: 250,
+        spread: 80,
+        scalar: 0.6,
+        shapes: ['circle'],
+        colors: ['#ff0090', '#00f0ff'], // Pink/Cyan for Radha
+        origin: { x: 0.8, y: 0.7 },
+        angle: 135,
+        gravity: 0.9
     });
 
-    // 4. Cleanup: Remove throw classes after 0.6s so they revert to breathing
     setTimeout(() => {
         krishnaWrapper.classList.remove('active-throw-k');
         radhaWrapper.classList.remove('active-throw-r');
