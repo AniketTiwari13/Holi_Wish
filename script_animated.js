@@ -28,52 +28,54 @@ document.addEventListener('touchstart', handleGlobalTap, { passive: false });
  * - First tap initializes the cinematic sequence.
  */
 function handleGlobalTap(e) {
+    // 1. IMMEDIATELY check if the audio context is suspended (The Mobile Wake-up)
+    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        if (context.state === 'suspended') {
+            context.resume();
+        }
+    }
+
+    // Standardize tap coordinates
     const tX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const tY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-    const originX = tX / window.innerWidth;
-    const originY = tY / window.innerHeight;
 
-    // Haptics on EVERY tap
     if ('vibrate' in navigator) {
         try { navigator.vibrate([50, 50, 50]); } catch (err) { }
     }
 
-    // Subsequent taps: powder burst at tap location
     if (timelineStarted) {
         confetti({
             particleCount: 150,
-            spread: 60,
-            scalar: 0.5,
+            origin: { x: tX / window.innerWidth, y: tY / window.innerHeight },
             shapes: ['circle'],
             colors: ['#ff0090', '#00f0ff', '#ffea00', '#ff6600'],
-            origin: { x: originX, y: originY },
-            gravity: 0.8
         });
         return;
     }
 
-    // === FIRST TAP INITIALIZATION ===
     timelineStarted = true;
 
-    if (audioEl) {
-        // MOBILE UNLOCK: Force load and unmute during the tap
-        audioEl.muted = false;
-        audioEl.load();
-
-        audioEl.play().then(() => {
-            audioEl.volume = 0;
-            let vol = 0;
-            const fade = setInterval(() => {
-                vol += 0.05;
-                if (vol >= 1) {
-                    audioEl.volume = 1;
-                    clearInterval(fade);
-                } else {
-                    audioEl.volume = vol;
-                }
-            }, 150);
-        }).catch(err => console.log("Mobile Audio Blocked:", err));
-    }
+    // 2. THE ABSOLUTE MOBILE UNLOCK
+    // We play it immediately, even at 0 volume, to tell the hardware "WE ARE GOING"
+    audioEl.volume = 0;
+    audioEl.play().then(() => {
+        // Fade in only AFTER we know it's playing
+        let vol = 0;
+        const fade = setInterval(() => {
+            vol += 0.05;
+            if (vol >= 1) {
+                audioEl.volume = 1;
+                clearInterval(fade);
+            } else {
+                audioEl.volume = vol;
+            }
+        }, 150);
+    }).catch(err => {
+        // If it still fails, we "brute force" it by re-triggering on the next click
+        timelineStarted = false;
+        console.log("Mobile Hardware Lock engaged. Try one more tap.");
+    });
 
     initGyroscope();
     hookLayer.style.opacity = '0';
@@ -146,29 +148,27 @@ function fireDirectionalCannons() {
     krishnaWrapper.classList.add('active-throw-k');
     radhaWrapper.classList.add('active-throw-r');
 
-    // Adjusted coordinates for hand alignment (y: 0.7 is the sweet spot)
-    // Krishna (Left → Right)
+    // Use y: 0.7 for Mobile (Portrait) and y: 0.8 for PC (Landscape)
+    const responsiveY = window.innerHeight > window.innerWidth ? 0.7 : 0.8;
+
+    // Krishna (Left)
     confetti({
-        particleCount: 250,
-        spread: 80,
-        scalar: 0.6,
+        particleCount: 200,
+        origin: { x: 0.2, y: responsiveY },
+        angle: 60,
+        spread: 55,
         shapes: ['circle'],
-        colors: ['#ffea00', '#ff6600'], // Yellow/Orange for Krishna
-        origin: { x: 0.2, y: 0.7 },
-        angle: 45,
-        gravity: 0.9
+        colors: ['#ffea00', '#ff6600']
     });
 
-    // Radha (Right → Left)
+    // Radha (Right)
     confetti({
-        particleCount: 250,
-        spread: 80,
-        scalar: 0.6,
+        particleCount: 200,
+        origin: { x: 0.8, y: responsiveY },
+        angle: 120,
+        spread: 55,
         shapes: ['circle'],
-        colors: ['#ff0090', '#00f0ff'], // Pink/Cyan for Radha
-        origin: { x: 0.8, y: 0.7 },
-        angle: 135,
-        gravity: 0.9
+        colors: ['#ff0090', '#00f0ff']
     });
 
     setTimeout(() => {
